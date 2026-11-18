@@ -3,7 +3,10 @@
 # go.mod requires nats-server v2.15.3. XRAY-1162975 was v2.15.1.
 # The published image is one scratch layer, so Alpine zlib is not present.
 
-FROM golang:1.27.3-alpine3.24 AS build
+FROM --platform=$BUILDPLATFORM golang:1.27.3-alpine3.24 AS build
+
+ARG TARGETOS
+ARG TARGETARCH
 
 RUN apk add --no-cache ca-certificates tzdata \
     && update-ca-certificates
@@ -13,7 +16,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 
-ENV CGO_ENABLED=0
+ENV CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH
 RUN go build -trimpath -buildvcs=false \
         -ldflags "-s -w -X main.version=0.20.3" \
         -o /tmp/prometheus-nats-exporter . \
