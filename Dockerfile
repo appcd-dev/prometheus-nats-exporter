@@ -39,7 +39,9 @@ RUN set -eux; \
     echo "${zlib_ver}" | grep -q '^zlib-1.4-r0 '; \
     echo "${zlib_ver}" | grep -q '1.3' && exit 1 || true; \
     rm -rf /var/cache/apk; \
-    mkdir -p /var/cache/apk
+    mkdir -p /var/cache/apk; \
+    addgroup -g 1000 nats; \
+    adduser -D -u 1000 -G nats nats
 
 COPY --from=build /tmp/prometheus-nats-exporter /usr/local/bin/prometheus-nats-exporter
 
@@ -56,6 +58,7 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 
 EXPOSE 7777
 
+USER nats
 ENTRYPOINT ["/entrypoint.sh"]
 
 LABEL org.opencontainers.image.title="prometheus-nats-exporter" \
