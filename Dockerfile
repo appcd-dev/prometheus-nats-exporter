@@ -17,7 +17,9 @@ ARG TARGETARCH
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
+COPY main.go ./
+COPY collector/ collector/
+COPY exporter/ exporter/
 
 ENV CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH
 RUN go build -trimpath -buildvcs=false \
